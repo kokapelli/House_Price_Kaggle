@@ -2,17 +2,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+from categorical_mappings import *
 
+DROPPED_COLUMNS = ['MSZoning', 'LotFrontage', 'Street', 'Alley', 'LotShape', 'LandContour', 'Utilities', 'LotConfig', 'LandSlope', 'Condition1', 'Condition2', 'YearRemodAdd', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd', 'MasVnrType', 'MasVnrArea', 'ExterQual', 'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr', 'KitchenQual', 'TotRmsAbvGrd', 'Functional', 'Fireplaces', 'FireplaceQu', 'GarageYrBlt', 'GarageFinish', 'GarageQual', 'GarageCond', 'PavedDrive', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolQC', 'Fence', 'MiscFeature', 'MiscVal', 'MoSold', 'YrSold', 'SaleType']
 
 def drop_columns(df, columns):
     df = df.drop(columns, axis=1)
     return df
 
-def get_null_column_sum(df):
+def get_null_vals(df):
     return df.isnull().sum()
 
 def get_classes(df):
     return list(df.columns.values)
+
+def get_avg_sale_given_column(df, column, count=False):
+    avg = df.groupby(column, as_index=False)['SalePrice'].mean().sort_values(by='SalePrice')
+    if(count):
+        counts = df[column].value_counts().values
+        avg['Count'] = counts.reshape(-1, 1)
+    
+    return avg
 
 def compute_histogram_bins(df, bin_size):
     min_val = np.min(df)
@@ -49,37 +59,34 @@ def bin_LotArea(df):
 
 def config_columns(df):
     df = bin_LotArea(df)
+    df['Neighborhood'] = df['Neighborhood'].map(NEIGHBORHOOD_MAPPING)
 
     return df
 
 if __name__ == "__main__":
     train = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/train.csv")
     test = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/test.csv")
-    print(train.shape, test.shape)
+
 
     train = config_columns(train)
     test = config_columns(test)
 
-    """
-    columns_to_drop = ['Example']
-    drop_columns(train, columns_to_drop)
-    drop_columns(test, columns_to_drop)
-    """
+    neigh = get_avg_sale_given_column(train, 'Neighborhood', True)
+
+    train = drop_columns(train, DROPPED_COLUMNS)
+    test = drop_columns(test, DROPPED_COLUMNS)
     
-    plt.hist(train['LotArea'])
+    """
+    plt.bar(neigh['Neighborhood'], neigh['SalePrice'], align='center')
     plt.xlabel('Value')
     plt.ylabel('Counts')
-    plt.title('Compute Bins Example')
     plt.grid(True)
-    plt.show()
-
-    #print(train['LotArea'].sort_values())
-    print(train['LotArea'].describe())
-    print(train["LotArea"].value_counts())
-
-    """
-    pclass_pivot = train.pivot_table(index="LotArea",values="SalePrice")
-    pclass_pivot.plot.bar()
     plt.show()
     """
     
+    print(train.shape, test.shape)
+    #print(get_avg_sale_given_column(train, 'Neighborhood', True))
+    print(get_null_vals(train['Neighborhood']))
+    print(train['Neighborhood'].describe())
+    print(train.head())
+    #print(train["Neighborhood"].value_counts())
