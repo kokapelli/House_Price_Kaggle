@@ -18,6 +18,7 @@ def get_classes(df):
 
 def get_avg_sale_given_column(df, column, count=False):
     avg = df.groupby(column, as_index=False)['SalePrice'].mean().sort_values(by='SalePrice')
+    avg = avg.rename(columns={'SalePrice': 'AvgSalePrice'})
     if(count):
         counts = df[column].value_counts().values
         avg['Count'] = counts.reshape(-1, 1)
@@ -60,21 +61,20 @@ def bin_LotArea(df):
 def config_columns(df):
     df = bin_LotArea(df)
     df['Neighborhood'] = df['Neighborhood'].map(NEIGHBORHOOD_MAPPING)
+    df['BldgType'] = df['BldgType'].map(BLDGTYPE_MAPPING)
 
     return df
 
 if __name__ == "__main__":
     train = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/train.csv")
     test = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/test.csv")
-
+    
+    train = drop_columns(train, DROPPED_COLUMNS)
+    test = drop_columns(test, DROPPED_COLUMNS)
 
     train = config_columns(train)
     test = config_columns(test)
 
-    neigh = get_avg_sale_given_column(train, 'Neighborhood', True)
-
-    train = drop_columns(train, DROPPED_COLUMNS)
-    test = drop_columns(test, DROPPED_COLUMNS)
     
     """
     plt.bar(neigh['Neighborhood'], neigh['SalePrice'], align='center')
@@ -83,10 +83,13 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.show()
     """
-    
+
     print(train.shape, test.shape)
-    #print(get_avg_sale_given_column(train, 'Neighborhood', True))
-    print(get_null_vals(train['Neighborhood']))
-    print(train['Neighborhood'].describe())
+    print("Missing Values: ", get_null_vals(train['BldgType']))
+    print(train['BldgType'].describe())
     print(train.head())
+    #print(get_avg_sale_given_column(train, 'BldgType', True))
+    print(train['BldgType'].value_counts())
+    print(train['Neighborhood'].value_counts())
+
     #print(train["Neighborhood"].value_counts())

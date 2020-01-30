@@ -12,7 +12,7 @@ NEIGHBORHOOD_MAPPING = {
 ,'IDOTRR':9
 ,'MeadowV':10
 ,'Mitchel':11
-,'Names':12
+,'NAmes':12
 ,'NoRidge':13
 ,'NPkVill':14
 ,'NridgHt':15
@@ -25,4 +25,12 @@ NEIGHBORHOOD_MAPPING = {
 ,'StoneBr':22
 ,'Timber':23
 ,'Veenker':24
+}
+
+BLDGTYPE_MAPPING = {
+'1Fam':0
+,'2fmCon':1
+,'Duplex':2
+,'TwnhsE':3
+,'Twnhs':4
 }
