@@ -62,6 +62,7 @@ def config_columns(df):
     df = bin_LotArea(df)
     df['Neighborhood'] = df['Neighborhood'].map(NEIGHBORHOOD_MAPPING)
     df['BldgType'] = df['BldgType'].map(BLDGTYPE_MAPPING)
+    df['HouseStyle'] = df['HouseStyle'].map(HOUSESTYLE_MAPPING)
 
     return df
 
@@ -75,9 +76,9 @@ if __name__ == "__main__":
     train = config_columns(train)
     test = config_columns(test)
 
-    
     """
-    plt.bar(neigh['Neighborhood'], neigh['SalePrice'], align='center')
+    tt = get_avg_sale_given_column(train, 'BldgType', True)
+    plt.bar(tt['BldgType'], tt['AvgSalePrice'], align='center')
     plt.xlabel('Value')
     plt.ylabel('Counts')
     plt.grid(True)
@@ -85,11 +86,10 @@ if __name__ == "__main__":
     """
 
     print(train.shape, test.shape)
-    print("Missing Values: ", get_null_vals(train['BldgType']))
-    print(train['BldgType'].describe())
+    print("Missing Values: ", get_null_vals(train['HouseStyle']))
+    print(train['HouseStyle'].describe())
     print(train.head())
-    #print(get_avg_sale_given_column(train, 'BldgType', True))
-    print(train['BldgType'].value_counts())
-    print(train['Neighborhood'].value_counts())
+    print(get_avg_sale_given_column(train, 'HouseStyle', True))
+    print(train['HouseStyle'].value_counts())
 
     #print(train["Neighborhood"].value_counts())

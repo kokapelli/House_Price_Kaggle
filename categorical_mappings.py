@@ -34,3 +34,14 @@ BLDGTYPE_MAPPING = {
 ,'TwnhsE':3
 ,'Twnhs':4
 }
+
+HOUSESTYLE_MAPPING = {
+'1Story': 0
+,'2Story': 1
+,'1.5Fin': 2
+,'SLvl': 3
+,'SFoyer': 4
+,'1.5Unf': 5
+,'2.5Unf': 6
+,'2.5Fin': 7
+}
