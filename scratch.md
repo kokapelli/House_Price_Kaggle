@@ -4,8 +4,10 @@
 2. Area, the size of the house has an immediate effect on the pricing
 3. Building year, Depending on the location there can be a correlation. An old classic neighbourhood may have a higher price.
 
+## **'SalePrice' : Target**
+
 ## Second feature culling
-* **'MSSubClass'** : Identifies the type of dwelling 
+* *'MSSubClass'* : Identifies the type of dwelling 
 * **'LotArea'**: Lot size in square feet
 * **'Neighborhood'**: Physical locations within Ames city limits
 * **'BldgType'**: Type of dwelling
@@ -102,6 +104,5 @@
 * *'YrSold'*
 * 'SaleType': Type of sale
 * **'SaleCondition'**: Condition of Sale
-**'SalePrice' : Target**
 
 [MD Cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
