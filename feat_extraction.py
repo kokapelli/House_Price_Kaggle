@@ -27,6 +27,19 @@ def get_avg_sale_given_column(df, column, count=False):
     
     return avg
 
+def dummy_data(data, columns):
+    for column in columns:
+        data = pd.concat([data, pd.get_dummies(data[column], prefix=column)], axis=1)
+        data = data.drop(column, axis=1)
+    return data
+
+def get_column_list(data):
+    column_list = list()
+    for col in data.columns: 
+        column_list.append(col)
+
+    return column_list
+
 def compute_histogram_bins(df, bin_size):
     min_val = np.min(df)
     max_val = np.max(df)
@@ -73,6 +86,6 @@ def prune_features(train, test):
         print(train.head())
         print(get_avg_sale_given_column(train, curr_column, True))
         print(train[curr_column].value_counts())
-    
+
     return train, test
     #print(train["Neighborhood"].value_counts())
