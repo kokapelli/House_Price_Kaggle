@@ -45,3 +45,21 @@ HOUSESTYLE_MAPPING = {
 ,'2.5Unf': 6
 ,'2.5Fin': 7
 }
+
+GARAGE_MAPPING = {
+'Attchd': 1
+,'Detchd': 2
+,'BuiltIn': 3
+,'Basment': 4
+,'CarPort': 5
+,'2Types': 6
+}
+
+SALECONDITION_MAPPING = {
+'Normal': 0
+,'Partial': 1
+,'Abnorml': 2
+,'Family': 3
+,'Alloca': 4
+,'AdjLand': 5
+}

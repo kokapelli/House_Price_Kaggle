@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 from categorical_mappings import *
+from feature_bins import *
 
-DROPPED_COLUMNS = ['MSZoning', 'LotFrontage', 'Street', 'Alley', 'LotShape', 'LandContour', 'Utilities', 'LotConfig', 'LandSlope', 'Condition1', 'Condition2', 'YearRemodAdd', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd', 'MasVnrType', 'MasVnrArea', 'ExterQual', 'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr', 'KitchenQual', 'TotRmsAbvGrd', 'Functional', 'Fireplaces', 'FireplaceQu', 'GarageYrBlt', 'GarageFinish', 'GarageQual', 'GarageCond', 'PavedDrive', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolQC', 'Fence', 'MiscFeature', 'MiscVal', 'MoSold', 'YrSold', 'SaleType']
+DEBUG = 0
+DROPPED_COLUMNS = ['OverallCond', 'MSZoning', 'LotFrontage', 'Street', 'Alley', 'LotShape', 'LandContour', 'Utilities', 'LotConfig', 'LandSlope', 'Condition1', 'Condition2', 'YearRemodAdd', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd', 'MasVnrType', 'MasVnrArea', 'ExterQual', 'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr', 'KitchenQual', 'TotRmsAbvGrd', 'Functional', 'Fireplaces', 'FireplaceQu', 'GarageYrBlt', 'GarageFinish', 'GarageQual', 'GarageCond', 'PavedDrive', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolQC', 'Fence', 'MiscFeature', 'MiscVal', 'MoSold', 'YrSold', 'SaleType']
 
 def drop_columns(df, columns):
     df = df.drop(columns, axis=1)
@@ -35,61 +37,42 @@ def compute_histogram_bins(df, bin_size):
     
     return bins
 
-def bin_LotArea(df):
-    """
-        mean      10516.828082
-        std        9981.264932
-        min        1300.000000
-        25%        7553.500000
-        50%        9478.500000
-        75%       11601.500000
-        max      215245.000000
-    """
-
-    df.loc[ df['LotArea'] <= 2000, 'LotArea'] = 0,
-    df.loc[(df['LotArea'] > 2000)   & (df['LotArea'] <= 4000),   'LotArea'] = 1,
-    df.loc[(df['LotArea'] > 4000)   & (df['LotArea'] <= 6000),   'LotArea'] = 2,
-    df.loc[(df['LotArea'] > 6000)   & (df['LotArea'] <= 8000),   'LotArea'] = 3,
-    df.loc[(df['LotArea'] > 8000)   & (df['LotArea'] <= 10000),  'LotArea'] = 4,
-    df.loc[(df['LotArea'] > 10000)  & (df['LotArea'] <= 25000),  'LotArea'] = 5,
-    df.loc[(df['LotArea'] > 25000)  & (df['LotArea'] <= 50000),  'LotArea'] = 6,
-    df.loc[(df['LotArea'] > 50000)  & (df['LotArea'] <= 100000), 'LotArea'] = 7,
-    df.loc[ df['LotArea'] > 100000, 'LotArea'] = 8
-
-    return df
-
 def config_columns(df):
     df = bin_LotArea(df)
+    df = bin_YearBuilt(df)
+    df = bin_GarageType(df)
+    df = has_pool(df)
     df['Neighborhood'] = df['Neighborhood'].map(NEIGHBORHOOD_MAPPING)
-    df['BldgType'] = df['BldgType'].map(BLDGTYPE_MAPPING)
+    df['BldgType']   = df['BldgType'].map(BLDGTYPE_MAPPING)
     df['HouseStyle'] = df['HouseStyle'].map(HOUSESTYLE_MAPPING)
-
+    df['GarageType'] = df['GarageType'].map(GARAGE_MAPPING)
+    df['GarageType'] = df['GarageType'].fillna(0)
+    df['SaleCondition'] = df['SaleCondition'].map(SALECONDITION_MAPPING)
+    
     return df
 
-if __name__ == "__main__":
-    train = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/train.csv")
-    test = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/test.csv")
-    
+def prune_features(train, test):
     train = drop_columns(train, DROPPED_COLUMNS)
     test = drop_columns(test, DROPPED_COLUMNS)
 
     train = config_columns(train)
     test = config_columns(test)
 
-    """
-    tt = get_avg_sale_given_column(train, 'BldgType', True)
-    plt.bar(tt['BldgType'], tt['AvgSalePrice'], align='center')
-    plt.xlabel('Value')
-    plt.ylabel('Counts')
-    plt.grid(True)
-    plt.show()
-    """
+    if(DEBUG):
+        curr_column = 'SaleCondition'
+        tt = get_avg_sale_given_column(train, curr_column, True)
+        plt.bar(tt[curr_column], tt['AvgSalePrice'], align='center')
+        plt.xlabel('Value')
+        plt.ylabel('Counts')
+        plt.grid(True)
+        plt.show()
 
-    print(train.shape, test.shape)
-    print("Missing Values: ", get_null_vals(train['HouseStyle']))
-    print(train['HouseStyle'].describe())
-    print(train.head())
-    print(get_avg_sale_given_column(train, 'HouseStyle', True))
-    print(train['HouseStyle'].value_counts())
-
+        print(train.shape, test.shape)
+        print("Missing Values: ", get_null_vals(train[curr_column]))
+        print(train[curr_column].describe())
+        print(train.head())
+        print(get_avg_sale_given_column(train, curr_column, True))
+        print(train[curr_column].value_counts())
+    
+    return train, test
     #print(train["Neighborhood"].value_counts())

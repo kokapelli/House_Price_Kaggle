@@ -6,6 +6,23 @@
 
 ## **'SalePrice' : Target**
 
+## Third feature culling
+### Ongoing...
+* *'MSSubClass'* : Identifies the type of dwelling 
+* **'LotArea'**: Lot size in square feet
+* **'Neighborhood'**: Physical locations within Ames city limits
+* **'BldgType'**: Type of dwelling
+* **'HouseStyle'**: Style of dwelling
+* **'OverallQual'**: Rates the overall material and finish of the house
+* **'OverallCond'**: Rates the overall condition of the house
+* **'YearBuilt'**: Original construction date
+* **'GarageType'**: Garage location
+* **'GarageCars'**: Size of garage in car capacity
+* **'GarageArea'**: Size of garage in square feet
+* **'PoolArea'**: Pool area in square feet
+* **'SaleCondition'**: Condition of Sale
+
+
 ## Second feature culling
 * *'MSSubClass'* : Identifies the type of dwelling 
 * **'LotArea'**: Lot size in square feet
