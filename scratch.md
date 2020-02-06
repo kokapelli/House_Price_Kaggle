@@ -1,4 +1,5 @@
 # Scratchpad
+[Excellent preprocessing descriptions](https://www.datacamp.com/community/tutorials/categorical-data)
 ## Important Factors
 1. Location where the house is located has a huge impact on the pricing
 2. Area, the size of the house has an immediate effect on the pricing

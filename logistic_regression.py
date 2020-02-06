@@ -19,6 +19,8 @@ def dummy_data(data, columns):
 def get_column_list(data):
     column_list = list()
     for col in data.columns: 
+        if(col == 'Id'):
+            continue
         column_list.append(col)
 
     return column_list
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     print(X.head())
     """
     
-
+    print(X.shape, test.shape)
     X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1, random_state=0)
 
     seed = 1                        # for reproducible purpose

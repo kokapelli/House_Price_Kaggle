@@ -1,22 +1,16 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+
+
 from categorical_mappings import *
 from feature_bins import *
+from preprocessing import *
+from plotting import *
 
 DEBUG = 0
 DROPPED_COLUMNS = ['OverallCond', 'MSZoning', 'LotFrontage', 'Street', 'Alley', 'LotShape', 'LandContour', 'Utilities', 'LotConfig', 'LandSlope', 'Condition1', 'Condition2', 'YearRemodAdd', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd', 'MasVnrType', 'MasVnrArea', 'ExterQual', 'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical', '1stFlrSF', '2ndFlrSF', 'LowQualFinSF', 'GrLivArea', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr', 'KitchenQual', 'TotRmsAbvGrd', 'Functional', 'Fireplaces', 'FireplaceQu', 'GarageYrBlt', 'GarageFinish', 'GarageQual', 'GarageCond', 'PavedDrive', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch', 'ScreenPorch', 'PoolQC', 'Fence', 'MiscFeature', 'MiscVal', 'MoSold', 'YrSold', 'SaleType']
 
-def drop_columns(df, columns):
-    df = df.drop(columns, axis=1)
-    return df
-
-def get_null_vals(df):
-    return df.isnull().sum()
-
-def get_classes(df):
-    return list(df.columns.values)
 
 def get_avg_sale_given_column(df, column, count=False):
     avg = df.groupby(column, as_index=False)['SalePrice'].mean().sort_values(by='SalePrice')
@@ -27,18 +21,6 @@ def get_avg_sale_given_column(df, column, count=False):
     
     return avg
 
-def dummy_data(data, columns):
-    for column in columns:
-        data = pd.concat([data, pd.get_dummies(data[column], prefix=column)], axis=1)
-        data = data.drop(column, axis=1)
-    return data
-
-def get_column_list(data):
-    column_list = list()
-    for col in data.columns: 
-        column_list.append(col)
-
-    return column_list
 
 def compute_histogram_bins(df, bin_size):
     min_val = np.min(df)
@@ -65,11 +47,28 @@ def config_columns(df):
     return df
 
 def prune_features(train, test):
+    #enc_train = str_encode_to_int(train)
+    #enc_train = encode_label(train, ['SaleCondition, GarageType'])
+    cat_columns = convert_object_to_category(train)
+    print(train.head())
+    #print(cat_columns)
+    labels = get_classes(cat_columns)
+    #print(labels)
+    label_dicts = cateogrical_to_numerical(train, labels)
+    #print(label_dicts)
+    enc_train = map_categorical_to_numerical(train, label_dicts)
+    print(enc_train.head())
+    univariate_selection(enc_train)
+    #print(filter_cat_cols(train).info())
+    #print(get_col_null_sum(train))
     train = drop_columns(train, DROPPED_COLUMNS)
     test = drop_columns(test, DROPPED_COLUMNS)
 
     train = config_columns(train)
     test = config_columns(test)
+
+
+    #plot_freq_dist(train, 'HouseStyle')
 
     if(DEBUG):
         curr_column = 'SaleCondition'
@@ -86,6 +85,13 @@ def prune_features(train, test):
         print(train.head())
         print(get_avg_sale_given_column(train, curr_column, True))
         print(train[curr_column].value_counts())
+        #train.boxplot(curr_column,'SalePrice',rot = 30,figsize=(5,6))
 
     return train, test
     #print(train["Neighborhood"].value_counts())
+
+if __name__ == "__main__":
+    train = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/train.csv")
+    test = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/test.csv")
+    train, test = prune_features(train, test)
+
