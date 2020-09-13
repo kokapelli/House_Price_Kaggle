@@ -1,5 +1,16 @@
 # Scratchpad
 [Excellent preprocessing descriptions](https://www.datacamp.com/community/tutorials/categorical-data)
+
+## Potential step-by-step
+1. Identify and Handle Null Value.
+2. Identify and Handle Outliers.
+3. Identify and Handle duplicates.
+4. Feature Engineering.
+5. Feature Importance.
+6. Hyper tuning.
+7. Cross-Validation.
+8. Ensemble Learning.
+
 ## Important Factors
 1. Location where the house is located has a huge impact on the pricing
 2. Area, the size of the house has an immediate effect on the pricing
