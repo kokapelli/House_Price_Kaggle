@@ -4,24 +4,22 @@ from sklearn.feature_selection import chi2
 from sklearn.preprocessing import LabelEncoder
 
 def univariate_selection(df):
-    df_features = df.shape[1]
-    X = df.iloc[:,0:df_features-1]
-    
-    # na fill may be a necessary evil
+    X = df.iloc[:,0:-1]
     X = X.fillna(0)
 
-    y = df.iloc[:,-1]
-    y = y.values.reshape(-1, 1)
-    #apply SelectKBest class to extract top 10 best features
+    Y = df.iloc[:,-1]
+    Y = Y.values.reshape(-1, 1)
+    
+    #Apply SelectKBest class to extract 10 best features
     bestfeatures = SelectKBest(score_func=chi2, k=10)
-    fit = bestfeatures.fit(X, y)
+    fit = bestfeatures.fit(X, Y)
     dfscores = pd.DataFrame(fit.scores_)
     dfcolumns = pd.DataFrame(X.columns)
 
     #concat two dataframes for better visualization 
     featureScores = pd.concat([dfcolumns,dfscores],axis=1)
     featureScores.columns = ['Feature','Score']
-    print(featureScores.nlargest(30,'Score'))
+    print(featureScores.nlargest(40,'Score'))
 
 
 """
