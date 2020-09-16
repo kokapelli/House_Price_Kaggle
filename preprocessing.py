@@ -1,7 +1,10 @@
 import pandas as pd
+import numpy as np
+
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 from sklearn.preprocessing import LabelEncoder
+from scipy import stats
 
 def univariate_selection(df):
     X = df.iloc[:,0:-1]
@@ -17,10 +20,20 @@ def univariate_selection(df):
     dfcolumns = pd.DataFrame(X.columns)
 
     #concat two dataframes for better visualization 
-    featureScores = pd.concat([dfcolumns,dfscores],axis=1)
+    featureScores = pd.concat([dfcolumns,dfscores], axis=1)
     featureScores.columns = ['Feature','Score']
-    print(featureScores.nlargest(40,'Score'))
+    print(featureScores.nlargest(20,'Score'))
 
+"""
+    Desc: Returns the Z-score values that exceed the set threshold
+    Param1: Dataset
+    Param2: Feature
+    Param3: Threshold
+    Output: Fetures exceeding the Z-score according to the threshold
+"""
+def z_score(df, feat, threshold):
+    z = np.abs(stats.zscore(df[feat]))
+    return (np.where(z > threshold))[0]
 
 """
     Desc: Encodes categorical values to numerical
@@ -134,3 +147,30 @@ def map_categorical_to_numerical(df, mapping):
         #df[k] = df[k].replace(v, inplace=True)
         df[k] = df[k].replace(v)
     return df
+
+"""
+    Desc: Gets all features with a numeric data type
+    Param1: Dataset
+    Output: All features with numeric data type
+"""
+def get_all_numerical(df):
+    # Finding numeric features
+    numeric_dtypes = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    numeric = []
+    for i in df.columns:
+        if df[i].dtype in numeric_dtypes:
+            numeric.append(i)
+
+    return numeric
+
+"""
+    Desc: Gets all features with a categorical data type
+    Param1: Dataset
+    Output: All features with categorical data type
+"""
+def get_all_categorical(df):
+    cols = df.columns
+    num_cols = get_all_numerical(df)
+    categorical = list(set(cols) - set(num_cols))
+
+    return categorical

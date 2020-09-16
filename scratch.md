@@ -1,7 +1,34 @@
 # Scratchpad
-[Excellent preprocessing descriptions](https://www.datacamp.com/community/tutorials/categorical-data)
 
 ## **'SalePrice' : Target**
+
+# Manual Selection
+* OverallQual
+* 
+
+# Univariate Selection Scores
+
+| Feat          | Score        | Use |
+| ------------- |:------------:|:---:|
+| LotArea       | 1.011497e+07 |  5  |
+| MiscVal       | 6.253332e+06 |     |
+| 2ndFlrSF      | 4.648841e+05 |     |
+| BsmtFinSF1    | 3.999851e+05 |     |
+| PoolArea      | 3.835642e+05 |     |
+| BsmtFinSF2    | 3.688827e+05 |     |
+| MasVnrArea    | 2.880241e+05 |     |
+| BsmtUnfSF     | 2.747512e+05 |     |
+| LowQualFinSF  | 1.968501e+05 |     |
+| GrLivArea     | 1.968501e+05 |  5  |
+| TotalBsmtSF   | 1.747065e+05 |     |
+| 3SsnPorch     | 1.549360e+05 |     |
+| ScreenPorch   | 1.366295e+05 |     |
+| WoodDeckSF    | 1.298338e+05 |     |
+| 1stFlrSF      | 1.238098e+05 |     |
+| EnclosedPorch | 9.888657e+04 |     |
+| GarageArea    | 9.618405e+04 |     |
+| GarageYrBlt   | 8.297764e+04 |     |
+| OpenPorchSF   | 7.436257e+04 |     |
 
 # All features
 
