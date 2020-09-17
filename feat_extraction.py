@@ -47,19 +47,19 @@ def refactor_features(df):
 if __name__ == "__main__":
     ALL_FEATURES = ['Exterior1st', 'Exterior2nd', 'MasVnrType',  'ExterQual',
        'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure',
-       'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'Heating', 'HeatingQC', 'CentralAir', 'Electrical',
+       'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'Heating', 'HeatingQC', 'CentralAir', 
        '1stFlrSF', '2ndFlrSF', 'LowQualFinSF',  'BsmtFullBath',
        'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr',
        'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch',
        'ScreenPorch',   'MiscFeature',  
         'SaleType', 'SaleCondition',  'BsmtFinType1_Unf']
 
-    CHOSEN_FEATURES = ['GrLivArea','TotalBsmtSF','TotalSF','Total_Home_Quality', 'Total_sqr_footage']
-    OBSOLETE_FEATURES = ['MiscVal','MSSubClass', 'MSZoning',   'Alley','Condition1', 'Condition2', 'BldgType', 'HouseStyle',  'YearRemodAdd', 'RoofStyle', 'RoofMatl','LotShape', 'LandContour', 'LotConfig', 'LandSlope','LotFrontage','LotArea','Functional', 'Fireplaces','PavedDrive','GarageCars',  'GarageQual', 'GarageCond','GarageType',  'GarageFinish','GarageYrBlt','GarageArea','FireplaceQu','KitchenQual','Neighborhood','YearBuilt','MasVnrArea','TotRmsAbvGrd', 'PoolArea','OverallQual','OverallCond''HasWoodDeck', 'HasEnclosedPorch', 'Has3SsnPorch','HasScreenPorch', 'Total_porch_sf', 'HasFireplace','HasBsmt','HasGarage','Fence','MoSold','HasPool','YrSold','SalePrice','HasOpenPorch','YrBltAndRemod', 'YearsSinceRemodel','Id', 'Total_Bathrooms',  'Has2ndFloor']
+    INTERESTING_FEATURES = ['Electrical','GrLivArea','TotalBsmtSF','TotalSF','Total_Home_Quality', 'Total_sqr_footage']
+    OBSOLETE_FEATURES = ['MiscVal','MSSubClass', 'MSZoning','Alley','Condition1', 'Condition2', 'BldgType', 'HouseStyle',  'YearRemodAdd', 'RoofStyle', 'RoofMatl','LotShape', 'LandContour', 'LotConfig', 'LandSlope','LotFrontage','LotArea','Functional', 'Fireplaces','PavedDrive','GarageCars',  'GarageQual', 'GarageCond','GarageType',  'GarageFinish','GarageYrBlt','GarageArea','FireplaceQu','KitchenQual','Neighborhood','YearBuilt','MasVnrArea','TotRmsAbvGrd', 'PoolArea','OverallQual','OverallCond''HasWoodDeck', 'HasEnclosedPorch', 'Has3SsnPorch','HasScreenPorch', 'Total_porch_sf', 'HasFireplace','HasBsmt','HasGarage','Fence','MoSold','HasPool','YrSold','SalePrice','HasOpenPorch','YrBltAndRemod', 'YearsSinceRemodel','Id', 'Total_Bathrooms',  'Has2ndFloor']
 
     df_train = pd.read_csv("Data/train.csv")
     df_test = pd.read_csv("Data/test.csv")
-    var = 'SalePrice'
+    var = 'MSSubClass'
 
     # Remove the IDs
     train_ID = df_train['Id']
@@ -67,11 +67,19 @@ if __name__ == "__main__":
     df_train.drop(['Id'], axis=1, inplace=True)
     df_test.drop(['Id'], axis=1, inplace=True)
 
+    all_features = combine_train_test(df_train, df_test, 'SalePrice')
+    
+    missing = percent_missing(all_features)
+    all_features = fill_numeric_missing(all_features)
+    
+
+
     #print(df_train.iloc[:, 0:10])
     
     #df_train = refactor_features(df_train)
     #print(df_train[var].value_counts())
-    plot_every_numeric(df_train, 'SalePrice')
+    #plot_every_category(df_train, 'SalePrice')
+    #plot_every_numeric(df_train, 'SalePrice')
     #plot_all_corr_heatmap(df_train, 'SalePrice')
 
     #df_train = outlier_processing(df_train)
@@ -79,7 +87,7 @@ if __name__ == "__main__":
 
     #scatter_plot(df_train, 'SalePrice', var)
     #box_plot(df_train, 'SalePrice', var)
-    #dist_plot(df_train, var, True)
+    #dist_plot(df_train, var, False)
 
 
     #https://www.kaggle.com/lavanyashukla01/how-i-made-top-0-3-on-a-kaggle-competition

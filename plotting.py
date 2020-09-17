@@ -16,9 +16,9 @@ def box_plot(df, target, feat):
     plt.show()
 
 def scatter_plot(df, target, feat):
-    sns.scatterplot(df[target], df[feat], alpha=0.3, ylim=(0,800000))
-    plt.ylabel(feat, fontsize=12)
-    plt.xlabel(target, fontsize=12)
+    sns.scatterplot(x=feat, y=target, palette='Blues', data=df)
+    plt.ylabel(target, fontsize=12)
+    plt.xlabel(feat, fontsize=12)
     plt.show()
 
 def dist_plot(df, feat, log_transform=None):
@@ -47,12 +47,16 @@ def plot_every_numeric(df, target):
     fig = plt.figure()
     
     for feature in list(df[numeric]):
-        sns.scatterplot(x=feature, y=target, palette='Blues', data=df)
-            
-        plt.xlabel('{}'.format(feature), size=15,labelpad=12.5)
-        plt.ylabel(target, size=15, labelpad=12.5)
-            
-        plt.show()
+        scatter_plot(df, target, feature)   
+
+def plot_every_category(df, target):
+    
+    categorical = get_all_categorical(df)
+
+    fig = plt.figure()
+    
+    for feature in list(df[categorical]):
+        box_plot(df, target, feature)
 
 def plot_all_corr_heatmap(df, target):
     corr = df.corr()

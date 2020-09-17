@@ -174,3 +174,40 @@ def get_all_categorical(df):
     categorical = list(set(cols) - set(num_cols))
 
     return categorical
+
+"""
+    Desc: Combines all features from the training and test dataset in 
+          preparation for data transformation
+    Param1: Training Dataset
+    Param2: Test Dataset
+    Param3: Target feature to be removed during processing
+    Output: Training and tesst dataset merged together
+"""
+def combine_train_test(train, test, target):
+    train_labels = train[target].reset_index(drop=True)
+    train_features = train.drop([target], axis=1)
+    test_features = test
+    all_features = pd.concat([train_features, test_features]).reset_index(drop=True)
+
+    return all_features
+
+"""
+    Desc: Retrieves the percent missing values in every feature
+    Param1: Dataset
+    Output: Dictionary of the percentage missing values of every feature
+"""
+def percent_missing(df):
+    data = pd.DataFrame(df)
+    df_cols = list(pd.DataFrame(data))
+    dict_x = {}
+    for i in range(0, len(df_cols)):
+        dict_x.update({df_cols[i]: round(data[df_cols[i]].isnull().mean()*100,2)})
+    
+    return sorted(dict_x.items(), key=lambda x: x[1], reverse=True)
+
+def fill_numeric_missing(features):
+    numeric = get_all_numerical(features)
+
+    features.update(features[numeric].fillna(0))  
+
+    return features
