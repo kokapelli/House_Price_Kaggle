@@ -211,3 +211,23 @@ def fill_numeric_missing(features):
     features.update(features[numeric].fillna(0))  
 
     return features
+
+# Log transformation
+def logs(res, ls):
+    m = res.shape[1]
+    for l in ls:
+        res = res.assign(newcol=pd.Series(np.log(1.01+res[l])).values)   
+        res.columns.values[m] = l + '_log'
+        m += 1
+
+    return res
+
+# Square transformation
+def squares(res, ls):
+    m = res.shape[1]
+    for l in ls:
+        res = res.assign(newcol=pd.Series(res[l]*res[l]).values)   
+        res.columns.values[m] = l + '_sq'
+        m += 1
+
+    return res 

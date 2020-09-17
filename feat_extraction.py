@@ -71,7 +71,7 @@ if __name__ == "__main__":
     
     missing = percent_missing(all_features)
     all_features = fill_numeric_missing(all_features)
-    
+    get_numeric_skew(all_features, 0.5)
 
 
     #print(df_train.iloc[:, 0:10])
