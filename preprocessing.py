@@ -5,6 +5,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 from sklearn.preprocessing import LabelEncoder
 from scipy import stats
+from scipy.stats import skew
 
 def univariate_selection(df):
     X = df.iloc[:,0:-1]
@@ -231,3 +232,46 @@ def squares(res, ls):
         m += 1
 
     return res 
+
+# https://stackoverflow.com/questions/17778394/list-highest-correlation-pairs-from-a-large-correlation-matrix-in-pandas
+def get_redundant_pairs(df):
+    pairs_to_drop = set()
+    cols = df.columns
+    for i in range(0, df.shape[1]):
+        for j in range(0, i+1):
+            pairs_to_drop.add((cols[i], cols[j]))
+
+    return pairs_to_drop
+
+# Keep in mind that this only works on numeric values
+# https://stackoverflow.com/questions/17778394/list-highest-correlation-pairs-from-a-large-correlation-matrix-in-pandas
+def get_top_abs_correlations(df, n=10):
+    df_numeric = df[get_all_numerical(df)]
+    au_corr = df_numeric.corr().abs().unstack()
+    labels_to_drop = get_redundant_pairs(df_numeric)
+    au_corr = au_corr.drop(labels=labels_to_drop)
+    au_corr_sort = au_corr.sort_values(ascending=False)
+    return au_corr_sort[0:n]
+
+def get_top_abs_correlation_to_target(df, target, n=10):
+    df_numeric = df[get_all_numerical(df)]
+    au_corr = df_numeric.corrwith(df_numeric[target]).drop(target)
+    au_corr_sort = au_corr.sort_values(ascending=False)
+    return au_corr_sort[0:n]
+
+def get_duplicates(df):
+    unique = len(set(df.Id))
+    tot_ids = df.shape[0]
+    duplicate_ids = tot_ids - unique
+    return duplicate_ids
+
+def drop_id_col(df):
+    df.drop("Id", axis = 1, inplace = True)
+    return df
+
+def get_skewed_feats(df, threshold):
+    numeric = get_all_numerical(df)
+    skewed_feats = df[numeric].apply(lambda x: skew(x.dropna()))
+    skewed_feats = skewed_feats[skewed_feats > threshold]
+    skewed_feats = skewed_feats.index
+    return skewed_feats

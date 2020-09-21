@@ -16,7 +16,7 @@ def process_features(train, test):
 
 def outlier_processing(df):
     
-    df = df.drop(z_score(df, 'LotArea', 3))
+    df = df.drop(z_score(df, 'GrLivArea', 6))
 
     return df
 
@@ -45,21 +45,10 @@ def refactor_features(df):
     return df
 
 if __name__ == "__main__":
-    ALL_FEATURES = ['Exterior1st', 'Exterior2nd', 'MasVnrType',  'ExterQual',
-       'ExterCond', 'Foundation', 'BsmtQual', 'BsmtCond', 'BsmtExposure',
-       'BsmtFinType1', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtFinSF2', 'BsmtUnfSF', 'Heating', 'HeatingQC', 'CentralAir', 
-       '1stFlrSF', '2ndFlrSF', 'LowQualFinSF',  'BsmtFullBath',
-       'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 'KitchenAbvGr',
-       'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', '3SsnPorch',
-       'ScreenPorch',   'MiscFeature',  
-        'SaleType', 'SaleCondition',  'BsmtFinType1_Unf']
-
-    INTERESTING_FEATURES = ['Electrical','GrLivArea','TotalBsmtSF','TotalSF','Total_Home_Quality', 'Total_sqr_footage']
-    OBSOLETE_FEATURES = ['MiscVal','MSSubClass', 'MSZoning','Alley','Condition1', 'Condition2', 'BldgType', 'HouseStyle',  'YearRemodAdd', 'RoofStyle', 'RoofMatl','LotShape', 'LandContour', 'LotConfig', 'LandSlope','LotFrontage','LotArea','Functional', 'Fireplaces','PavedDrive','GarageCars',  'GarageQual', 'GarageCond','GarageType',  'GarageFinish','GarageYrBlt','GarageArea','FireplaceQu','KitchenQual','Neighborhood','YearBuilt','MasVnrArea','TotRmsAbvGrd', 'PoolArea','OverallQual','OverallCond''HasWoodDeck', 'HasEnclosedPorch', 'Has3SsnPorch','HasScreenPorch', 'Total_porch_sf', 'HasFireplace','HasBsmt','HasGarage','Fence','MoSold','HasPool','YrSold','SalePrice','HasOpenPorch','YrBltAndRemod', 'YearsSinceRemodel','Id', 'Total_Bathrooms',  'Has2ndFloor']
 
     df_train = pd.read_csv("Data/train.csv")
     df_test = pd.read_csv("Data/test.csv")
-    var = 'MSSubClass'
+    var = 'TotalBsmtSF'
 
     # Remove the IDs
     train_ID = df_train['Id']
@@ -71,23 +60,16 @@ if __name__ == "__main__":
     
     missing = percent_missing(all_features)
     all_features = fill_numeric_missing(all_features)
-    get_numeric_skew(all_features, 0.5)
+    df_train = refactor_features(df_train)
 
+    # in case of positive skewness, log transformations usually works well.
+    df_train['SalePrice'] = np.log(df_train['SalePrice'])
 
-    #print(df_train.iloc[:, 0:10])
-    
-    #df_train = refactor_features(df_train)
-    #print(df_train[var].value_counts())
-    #plot_every_category(df_train, 'SalePrice')
-    #plot_every_numeric(df_train, 'SalePrice')
-    #plot_all_corr_heatmap(df_train, 'SalePrice')
+    # Process chosen features
+    df_train = outlier_processing(df_train)
+    df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
+    df_train.loc[df_train['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
 
-    #df_train = outlier_processing(df_train)
-    #df_train = df_train.drop(z_score(df_train, 'LotArea', 3))
-
-    #scatter_plot(df_train, 'SalePrice', var)
-    #box_plot(df_train, 'SalePrice', var)
-    #dist_plot(df_train, var, False)
-
-
-    #https://www.kaggle.com/lavanyashukla01/how-i-made-top-0-3-on-a-kaggle-competition
+    # Convert categorical variable into dummy
+    df_train = pd.get_dummies(df_train)
+    print(get_skewed_feats(df_train, 0.5))

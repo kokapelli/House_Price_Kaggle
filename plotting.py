@@ -40,6 +40,10 @@ def dist_plot(df, feat, log_transform=None):
     sns.despine(trim=True, left=True)
     plt.show()
 
+def prob_plot(df, feat):
+    stats.probplot(df[feat], plot=plt)
+    plt.show()
+
 def plot_every_numeric(df, target):
     
     numeric = get_all_numerical(df)
@@ -62,4 +66,22 @@ def plot_all_corr_heatmap(df, target):
     corr = df.corr()
     plt.subplots(figsize=(14,11))
     sns.heatmap(corr, cmap="twilight_shifted_r", square=True)
+    plt.show()
+
+def plot_zoom_corr_heatmap(df, target, feats):
+    
+    corrmat = df.corr()
+    f, ax = plt.subplots(figsize=(12, 9))
+    sns.heatmap(corrmat, cmap="twilight_shifted_r", vmax=.8, square=True)
+    cols = corrmat.nlargest(feats, target)[target].index
+    cm = np.corrcoef(df[cols].values.T)
+    sns.set(font_scale=1.25)
+    hm = sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f', annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
+    plt.show()
+
+def plot_thresholded_corr_heatmap(df, threshold):
+    corr = df.corr()
+    kot = corr[corr>=threshold]
+    plt.figure(figsize=(12,8))
+    sns.heatmap(kot, cmap="twilight_shifted_r")
     plt.show()
