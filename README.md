@@ -9,8 +9,3 @@ It is your job to predict the sales price for each house. For each Id in the tes
 
 # Metric
 Submissions are evaluated on Root-Mean-Squared-Error (RMSE) between the logarithm of the predicted value and the logarithm of the observed sales price. (Taking logs means that errors in predicting expensive houses and cheap houses will affect the result equally.)
-
-# Important Factors
-1. Location, where the house is located has a huge impact on the pricing
-2. Area, the size of the house has an immediate effect on the pricing
-3. Building year, Depending on the location there can be a correlation. An old classic neighbourhood may have a higher price.

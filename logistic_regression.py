@@ -7,28 +7,10 @@ from sklearn.model_selection import train_test_split
 
 from feat_extraction import *
 
-# Advanced regression techniques like random forest and gradient boosting
-TRAIN = 1
-
-def dummy_data(data, columns):
-    for column in columns:
-        data = pd.concat([data, pd.get_dummies(data[column], prefix=column)], axis=1)
-        data = data.drop(column, axis=1)
-    return data
-
-def get_column_list(data):
-    column_list = list()
-    for col in data.columns: 
-        if(col == 'Id'):
-            continue
-        column_list.append(col)
-
-    return column_list
-
 
 if __name__ == "__main__":
-    train = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/train.csv")
-    test = pd.read_csv("/Users/Kukus/Desktop/House_Prices_Kaggle/Data/test.csv")
+    train = pd.read_csv("Data/train.csv")
+    test = pd.read_csv("Data/test.csv")
     train, test = prune_features(train, test)
 
     id_test = test['Id'].values
@@ -37,14 +19,6 @@ if __name__ == "__main__":
     y = train['SalePrice'].values
     y = y.astype(float).reshape(-1, 1)
     X = train.drop('SalePrice', axis=1)
-
-    """
-    columns = get_column_list(X)
-    print(columns)
-    X = dummy_data(X, columns)
-    test = dummy_data(test, columns)
-    print(X.head())
-    """
     
     print(X.shape, test.shape)
     X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1, random_state=0)
