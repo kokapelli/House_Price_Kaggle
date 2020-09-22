@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from collections import Counter
 
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
@@ -198,20 +199,10 @@ def combine_train_test(train, test, target):
     Output: Dictionary of the percentage missing values of every feature
 """
 def percent_missing(df):
-    data = pd.DataFrame(df)
-    df_cols = list(pd.DataFrame(data))
-    dict_x = {}
-    for i in range(0, len(df_cols)):
-        dict_x.update({df_cols[i]: round(data[df_cols[i]].isnull().mean()*100,2)})
-    
-    return sorted(dict_x.items(), key=lambda x: x[1], reverse=True)
+    all_data_na = (df.isnull().sum() / len(df)) * 100
+    all_data_na = all_data_na.drop(all_data_na[all_data_na == 0].index).sort_values(ascending=False)[:30]
 
-def fill_numeric_missing(features):
-    numeric = get_all_numerical(features)
-
-    features.update(features[numeric].fillna(0))  
-
-    return features
+    return all_data_na
 
 # Log transformation
 def logs(res, ls):
@@ -273,5 +264,103 @@ def get_skewed_feats(df, threshold):
     numeric = get_all_numerical(df)
     skewed_feats = df[numeric].apply(lambda x: skew(x.dropna()))
     skewed_feats = skewed_feats[skewed_feats > threshold]
-    skewed_feats = skewed_feats.index
-    return skewed_feats
+    return skewed_feats.index
+
+def log_skewed_feats(df, threshold):
+    skewed_feats = get_skewed_feats(df, threshold)
+
+    df[skewed_feats] = np.log1p(df[skewed_feats])
+    return df
+
+def fill_na_to_none(df, features):
+    for feat in features:
+        df[feat] = df[feat].fillna("None")
+
+    return df
+
+# Predonimantly used for nominal values
+def fill_na_to_zero(df, features):
+    for feat in features:
+        df[feat] = df[feat].fillna(0)
+
+    return df
+
+"""
+    Desc: Takes a dataframe df of features and returns a list of the indices
+            corresponding to the observations containing more than n outliers according
+            to the Tukey method.
+    Param1: dataset
+    Param2: Number of outliers
+    Param3: Features
+    Param4: Boolean determining whether to immediately drop values
+    Output: List of detected outliers
+"""
+def detect_outliers(df, n, features, drop=False):
+
+    outlier_indices = []
+    
+    # iterate over features(columns)
+    for col in features:
+        # 1st quartile (25%)
+        Q1 = np.percentile(df[col], 25)
+        # 3rd quartile (75%)
+        Q3 = np.percentile(df[col],75)
+        # Interquartile range (IQR)
+        IQR = Q3 - Q1
+        
+        # outlier step
+        outlier_step = 1.7 * IQR ## increased to 1.7
+        
+        # Determine a list of indices of outliers for feature col
+        outlier_list_col = df[(df[col] < Q1 - outlier_step) | (df[col] > Q3 + outlier_step )].index
+        
+        # append the found outlier indices for col to the list of outlier indices 
+        outlier_indices.extend(outlier_list_col)
+        
+    # select observations containing more than 2 outliers
+    outlier_indices = Counter(outlier_indices)        
+    outliers = list( k for k, v in outlier_indices.items() if v > n )
+    
+    # Drop outliers
+    if(drop):
+        print(f"{len(outliers)} dropped")
+        df = df.drop(outliers, axis = 0).reset_index(drop=True)
+
+        return df
+
+    return outliers   
+
+"""
+    Desc: Retrieves various basic and useful information regarding the dataset
+    Param1: dataset
+    Output: dataframe containing information about various values
+"""
+def basic_details(df):
+    b = pd.DataFrame()
+    b['Missing value'] = df.isnull().sum()
+    b['N unique value'] = df.nunique()
+    b['dtype'] = df.dtypes
+
+    return b
+
+"""
+    Desc: Retrieves valuable numeric information about the features in the dataset 
+    Param1: dataset
+    Output: Dataframe containing various numeric values for each column
+"""
+def descriptive_stat_feat(df):
+    df = pd.DataFrame(df)
+    dcol= [c for c in df.columns if df[c].nunique()>=10]
+    d_median = df[dcol].median(axis=0)
+    d_mean = df[dcol].mean(axis=0)
+    q1 = df[dcol].apply(np.float32).quantile(0.25)
+    q3 = df[dcol].apply(np.float32).quantile(0.75)
+    
+    #Add mean and median column to data set having more then 10 categories
+    for c in dcol:
+        df[c+str('_median_range')] = (df[c].astype(np.float32).values > d_median[c]).astype(np.int8)
+        df[c+str('_mean_range')] = (df[c].astype(np.float32).values > d_mean[c]).astype(np.int8)
+        df[c+str('_q1')] = (df[c].astype(np.float32).values < q1[c]).astype(np.int8)
+        df[c+str('_q3')] = (df[c].astype(np.float32).values > q3[c]).astype(np.int8)
+
+    return df
